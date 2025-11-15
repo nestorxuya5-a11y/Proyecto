@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Game Regional</title>
+  <meta name="description" content="Proyecto de inteligencia artificial y juegos retro - Game Regional" />
+  <style>
+    :root{
+      --bg-image: url('https://64.media.tumblr.com/999dbd7247af53e20d0753c4f88a81e2/tumblr_nfbz7l2Muj1rrftcdo1_400.gif');
+      --max-width: 1100px;
+      --accent: #00d4ff;
+      --text: #ffffff;
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+
+    body{
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color:var(--text);
+      line-height:1.5;
+      background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), var(--bg-image);
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+      background-attachment: fixed;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      overflow-x:hidden;
+    }
+
+    header{
+      width:100%;
+      max-width:var(--max-width);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:15px;
+      padding:18px 20px;
+      position:relative;
+      z-index:10;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .logo{
+      width:100px;
+      height:100px;
+      object-fit:contain;
+      border-radius:5px;
+      background:rgba(255,255,255,0.06);
+      padding:6px;
+      flex-shrink:0;
+    }
+
+    .brand .title-wrap{ display:flex; flex-direction:column; gap:4px; }
+    .brand h1{ font-size:1.4rem; letter-spacing:0.6px; margin:0; }
+    .brand p{ font-size:0.8rem; opacity:0.9; margin-top:2px; }
+
+    .uni-logo{
+      position:absolute;
+      top:32px;
+      right:8px;
+      width:150px;
+      height:auto;
+      object-fit:contain;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(6px);
+      padding:11px;
+      border-radius:12px;
+      box-shadow:0 2px 10px rgba(0,0,0,0.25);
+      z-index:40;
+    }
+
+    nav{ z-index:12; }
+
+    .nav-list{
+      display:flex;
+      gap:14px;
+      list-style:none;
+      align-items:center;
+    }
+
+    .nav-list a{
+      color:var(--text);
+      text-decoration:none;
+      padding:8px 12px;
+      border-radius:8px;
+      font-weight:600;
+      font-size:0.95rem;
+    }
+
+    main{
+      width:100%;
+      max-width:var(--max-width);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      gap:20px;
+      padding:60px 20px;
+      min-height: calc(100vh - 160px);
+    }
+
+    .card{
+      background:rgba(0,0,0,0.35);
+      backdrop-filter: blur(6px);
+      padding:20px 24px;
+      border-radius:14px;
+      max-width:900px;
+      width:100%;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+    }
+
+    .section-title{ font-size:1.2rem; margin-bottom:8px; font-weight:700; }
+    .small-note{ font-size:0.95rem; opacity:0.9; margin-top:8px; }
+
+    .members-grid{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap:14px;
+      margin-top:12px;
+    }
+    .member{
+      background: rgba(255,255,255,0.03);
+      padding:12px;
+      border-radius:10px;
+      min-height:90px;
+    }
+    .member h3{ margin:0 0 6px 0; font-size:1rem; }
+    .member p{ margin:0; font-size:0.95rem; opacity:0.92; }
+
+    footer{
+      width:100%;
+      max-width:var(--max-width);
+      text-align:center;
+      padding:18px 0;
+      color:rgba(255,255,255,0.8);
+      font-size:0.95rem;
+    }
+
+    /* ====== MOBILE ====== */
+    @media (max-width:900px){
+      .members-grid{ grid-template-columns:1fr; }
+
+      /* Ajuste título más pequeño en celular */
+      .brand h1{ font-size:1.1rem; }
+      .uni-logo{ width:100px; padding:8px; top:6px; }
+
+      /* Mover los botones existentes debajo del logo y alinearlos a la derecha */
+      nav{
+        position:absolute;
+        top: 130px; /* debajo del logo */
+        left:20px; /* alineado a la izquierda*/
+        display:flex;
+        flex-direction:column; /* botones uno debajo del otro */
+        gap:8px;
+      }
+
+      nav .nav-list{
+        flex-direction:column;
+        gap:10px;
+      }
+
+      nav .nav-list a{
+        width:140px;
+        text-align:center;
+        padding:8px 0;
+        background: rgba(255,255,255,0.1);
+        color:#012;
+        text-decoration:none;
+        border-radius:8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <img src="https://media.istockphoto.com/id/1158066736/es/vector/vector-de-juego-arcade-de-joystick-gr%C3%A1fico.jpg?s=612x612&w=0&k=20&c=XOox5eS9TapBMGJtTCCGKA8sN4qpfcNj-kaWaY4ky0c=" alt="Logotipo de Game Regional" class="logo">
+      <div class="title-wrap">
+        <h1>Games Regional</h1>
+        <p>“La imaginación es el primer paso para programar la realidad.”</p>
+      </div>
+    </div>
+
+    <nav aria-label="Menú principal">
+      <ul id="main-nav" class="nav-list" role="menubar">
+        <li role="none"><a role="menuitem" href="Juegos.html">Juego</a></li>
+        <li role="none"><a role="menuitem" href="Chatbot.html">ChatBot</a></li>
+      </ul>
+
+      <ul id="mobile-nav" class="nav-list mobile" aria-hidden="true" style="display:none;">
+        <li><a href="Juegos.html">Juego</a></li>
+        <li><a href="Chatboot.html">ChatBot</a></li>
+      </ul>
+    </nav>
+
+    <a href="https://uregionalregion2.edu.gt/licenciatura-en-administracion-de-sistemas-informaticos/" target="_blank" rel="noopener">
+      <img src="https://moria.aurens.com/organizations/362029ae-4545-4e01-a1d9-5a79a6e6f493/logos/26b681-regional.png" alt="Logo Universidad" class="uni-logo" />
+    </a>
+  </header>
+
+  <main>
+    <article class="card" id="proyecto">
+      <div class="section-title">URGAME</div>
+      <p class="small-note">¡Bienvenido a tu zona de juegos!<br>
+Este espacio ha sido creado para revivir la magia de nuestra infancia y disfrutar nuevamente la emoción de los juegos clásicos.
+
+Explora una colección de títulos que marcaron generaciones: aventuras llenas de color, velocidad, reflejos y diversión sin límites.
+Cada partida es un viaje al pasado, donde los píxeles cobraban vida y la diversión nunca terminaba.
+
+Y eso no es todo: muy pronto planeamos integrar mas videojuegos. </p>
+    </article>
+
+    <article class="card" id="universidad">
+      <div class="section-title">Universidad Regional De Guatemala</div>
+      <p class="small-note">Historia y Fundación
+
+La Universidad Regional de Guatemala (U-Regional) fue oficialmente autorizada el 4 de septiembre de 2014 por el Consejo de la Enseñanza Privada Superior (CEPS).<br> 
+
+Se trata de una universidad privada con personalidad jurídica propia. 
+<br> 
+
+En su décimo aniversario (2024), la U‑Regional reportó tener cerca de 70 sedes académicas en todo el país. 
+<br> 
+Misión, Visión y Filosofía
+
+Su misión es “formar profesionales de calificación superior mediante programas de educación, investigación y extensión”, enfocados al desarrollo sostenible del país.
+<br> 
+Visión institucional: ser un centro clave para el desarrollo social, científico, cultural y tecnológico de Guatemala.
+<br> 
+Filosofía: concibe la educación como un derecho humano y un bien social. Promueve valores como la dignidad, la integridad, la justicia y la responsabilidad. 
+</p>
+    </article>
+
+    <article class="card" id="carrera">
+      <div class="section-title">licenciatura en administracion de sistemas informaticos</div>
+      <p class="small-note">
+Licenciatura en Administración de Sistemas Informáticos
+
+Aptitudes: Amplia formación y conocimientos, analítico, capacidad de resolución de problemas, buena comunicación, metódico, ordenado y con capacidad para trabajar en equipo.
+<br>
+Técnico en Informática: Este título se obtiene al cumplir con los requisitos establecidos por la universidad, además de haber realizado prácticas y/o seminarios, y concluir los 6 semestres del pensum.
+<br>
+Licenciatura: Conformada por un total de 70 asignaturas, para graduarse se deberá cumplir con los requisitos establecidos por la universidad, además de culminar los procesos de prácticas, tesis y/o proyectos, y aprobar 72 cursos del idioma inglés.</p>
+    </article>
+
+    <article class="card" id="integrantes">
+      <div class="section-title">Integrantes y Roles del Proyecto </div>
+      <p class="small-note"></p>
+      <div class="members-grid">
+        <div class="member"><h3>Nestor Xuyá: Programador e Integrador
+</h3><p>Responsable de la implementación central del proyecto, integración de módulos y funcionamiento general del sistema.</p></div>
+        <div class="member"><h3>Carlos Boch: Programador de Chatbot
+</h3><p>Encargado del diseño, programación y optimización del chatbot para garantizar una interacción eficiente con el usuario.</p></div>
+        <div class="member"><h3>Axel Folgar: Programador de Videojuegos
+</h3><p>Responsable del diseño, programación y adaptación de los videojuegos integrados en la plataforma.</p></div>
+        <div class="member"><h3>Johao Veliz: Analista de Diagramas de Flujo
+</h3><p>Encargado del análisis de procesos y elaboración de diagramas que representan la lógica, estructura y funcionamiento del sistema.
+</p></div>
+        <div class="member"><h3>Josthin de la Cruz : Integrador de Documentación </h3>
+            <p>Responsable de la documentación técnica, corrección ortográfica y la presentación estructurada del contenido del proyecto.</p></div>
+      </div>
+    </article>
+  </main>
+
+  <footer>
+    <p>© <span id="year">2025</span> Game Regional — Grupo #2 Sistemas Segundo Semestre.</p>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

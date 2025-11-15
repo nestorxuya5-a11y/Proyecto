@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>RegionalGame — Asistente Gamer IA</title>
+  <meta name="description" content="RegionalGame: ayuda rápida sobre Mario Bros, Pac-Man y Snake." />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0b0d14;
+      --card: #151929;
+      --muted: #94a3b8;
+      --accent: #00f5d4;
+      --radius: 12px;
+      font-family: 'Inter', sans-serif;
+      color-scheme: dark;
+    }
+    body { margin:0; background: radial-gradient(circle at top,#1e1f2f 0%,#0b0d14 100%); color:#e6eef8; display:flex; flex-direction:column; height:100vh; }
+    * { box-sizing:border-box; }
+    .container { max-width:900px; margin:0 auto; padding:0 12px; display:flex; flex-direction:column; flex:1; }
+    header { display:flex; align-items:center; justify-content:space-between; padding:16px 0; }
+    .logo { font-family:'Orbitron',sans-serif; font-size:1.4rem; color:var(--accent); font-weight:700; }
+    .chat-box { background:var(--card); border-radius:var(--radius); padding:16px; flex:1; overflow-y:auto; border:1px solid rgba(255,255,255,0.08); display:flex; flex-direction:column; gap:8px; }
+    .message { padding:10px 14px; border-radius:10px; max-width:80%; line-height:1.4; word-wrap:break-word; }
+    .user { background:var(--accent); color:#000; margin-left:auto; text-align:right; }
+    .bot { background:rgba(255,255,255,0.05); color:var(--muted); }
+    .typing { font-style:italic; color:var(--muted); animation:blink 1s infinite; }
+    @keyframes blink { 50% { opacity:0.4; } }
+    .input-area { display:flex; gap:8px; margin-top:10px; padding-bottom:10px; }
+    input { flex:1; padding:12px; border-radius:var(--radius); border:1px solid rgba(255,255,255,0.1); background:transparent; color:inherit; font-size:1rem; outline:none; }
+    button { background:var(--accent); border:none; padding:12px 16px; border-radius:var(--radius); cursor:pointer; color:#000; font-weight:700; }
+    .game-buttons { display:flex; justify-content:center; gap:12px; margin:10px 0 6px; flex-wrap:wrap; }
+    .game-btn { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1); border-radius:var(--radius); color:var(--accent); padding:8px 14px; font-weight:600; cursor:pointer; }
+    .game-btn:hover { background:var(--accent); color:#000; }
+    .selected { box-shadow:0 0 0 3px rgba(0,245,212,0.07); background:linear-gradient(90deg, rgba(0,245,212,0.06), rgba(255,255,255,0.02)); border-color:rgba(0,245,212,0.2); }
+    .help { font-size:0.85rem; color:var(--muted); text-align:center; margin-top:6px; }
+    footer { text-align:center; color:var(--muted); font-size:0.8rem; padding:10px 0; }
+    @media (max-width:600px){ .chat-box{ height:65vh; } .logo{ font-size:1.2rem; } input,button{ font-size:0.9rem; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header><div class="logo">🎮 RegionalGame</div></header>
+
+    <main>
+      <div class="chat-box" id="chatBox">
+        <div class="message bot">👾 ¡Hola! Soy <b>RegionalGame</b>. Elige un juego o pregunta: "información", "personajes", "estrategias" o nombra un personaje.</div>
+
+        <div class="game-buttons" id="gameButtons">
+          <button class="game-btn" data-game="mario">🍄 Mario Bros</button>
+          <button class="game-btn" data-game="pacman">👻 Pac-Man</button>
+          <button class="game-btn" data-game="snake">🐍 Snake</button>
+        </div>
+
+        <div class="help">Ej.: "personajes de Mario", "estrategias Pac-Man", "¿cómo vencer a Bowser?"</div>
+      </div>
+
+      <div class="input-area">
+        <input id="userInput" type="text" placeholder="Escribe tu pregunta gamer..." />
+        <button id="sendBtn">Enviar</button>
+      </div>
+    </main>
+
+    <footer>© <span id="year"></span> RegionalGame — Respuestas breves</footer>
+  </div>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    const chatBox = document.getElementById('chatBox');
+    const input = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+
+    // ---- Base de conocimiento (respuestas breves) ----
+    const gameData = {
+      mario: {
+        name: 'Mario Bros',
+        overview: 'Franquicia de Nintendo; plataformas donde Mario rescata a Peach y supera mundos con power-ups y secretos.',
+        history: 'Nació en Donkey Kong (1981); Super Mario Bros (1985) definió el género de plataformas.',
+        objective: 'Recorrer niveles, derrotar enemigos y rescatar a la princesa o completar objetivos del juego.',
+        gameplay: 'Saltos precisos, power-ups (hongo, flor, estrella), secretos y jefes por mundo.',
+        strategies: [
+          'Explora esquinas y golpea bloques sospechosos.',
+          'Conserva power-ups antes de jefes importantes.',
+          'Memoriza patrones de enemigos y plataformas.'
+        ],
+        tipsForLevels: [
+          'Principiantes: domina el salto y la inercia.',
+          'Intermedios: busca rutas alternativas y 1-Ups ocultos.',
+          'Avanzados: conserva vidas y practica patrones de jefes.'
+        ],
+        characters: {
+          'mario': 'Héroe principal; saltador ágil y versátil.',
+          'luigi': 'Hermano de Mario; suele saltar más alto.',
+          'princess peach': 'Objetivo frecuente; princesa del Reino Champiñón.',
+          'toad': 'Ayudante/guía en muchos juegos.',
+          'yoshi': 'Compañero que traga enemigos y ayuda a saltar.',
+          'bowser': 'Antagonista principal; jefe final en muchas entregas.',
+          'bowser jr.': 'Hijo de Bowser, jefe recurrente.',
+          'koopalings': 'Grupo de jefes al servicio de Bowser (Larry, Morton, Wendy, Iggy, Roy, Lemmy, Ludwig).',
+          'wario': 'Anti-héroe/rival con juegos propios.',
+          'waluigi': 'Rival de Luigi en spin-offs.',
+          'kamek': 'Mago aliado de Bowser.',
+          'donkey kong': 'Personaje clásico que cruza sagas en spin-offs.'
+        }
+      },
+
+      pacman: {
+        name: 'Pac-Man',
+        overview: 'Arcade clásico de 1980: comer puntos en un laberinto y evitar fantasmas; Power Pellets permiten comer fantasmas temporalmente.',
+        history: 'Diseñado por Toru Iwatani; enorme éxito en arcades y cultura pop.',
+        objective: 'Comer todos los puntos para pasar de nivel sin ser atrapado por los fantasmas.',
+        gameplay: 'Moverse por laberintos, usar túneles y Power Pellets estratégicamente.',
+        strategies: [
+          'Aprende patrones de los 4 fantasmas.',
+          'Usa túneles para escapar y guarda Power Pellets para emergencias.',
+          'Recoge frutas cuando sea seguro.'
+        ],
+        tipsForLevels: [
+          'Inicio: memoriza comportamientos básicos.',
+          'Medio: administra Power Pellets.',
+          'Alto: evita persecuciones prolongadas y usa esquinas.'
+        ],
+        characters: {
+          'pac-man': 'Protagonista amarillo que come puntos y frutas.',
+          'blinky': 'Fantasma rojo: perseguidor directo.',
+          'pinky': 'Fantasma rosa: intenta adelantarte.',
+          'inky': 'Fantasma azul: comportamiento combinado y variable.',
+          'clyde': 'Fantasma naranja: alterna entre perseguir y retirarse.',
+          'ms. pac-man': 'Versión alternativa con laberintos distintos.',
+          'cherry': 'Fruta de puntaje inicial.',
+          'strawberry': 'Fruta de mayor puntaje en niveles medios.',
+          'melon': 'Fruta de alto puntaje en niveles avanzados.'
+        }
+      },
+
+      snake: {
+        name: 'Snake',
+        overview: 'Juego donde controlas una serpiente que crece al comer; evita chocar contra ti mismo o los bordes.',
+        history: 'Versiones desde los 70; popular en móviles Nokia en los 90.',
+        objective: 'Comer para crecer y lograr la mayor puntuación sin chocar.',
+        gameplay: 'Movimiento en rejilla, crecimiento por comida, aumento de dificultad.',
+        strategies: [
+          'Mantén siempre una salida de escape.',
+          'Usa patrones en espiral o zig-zag cuando crezcas.',
+          'Prioriza control sobre velocidad cuando la serpiente es larga.'
+        ],
+        tipsForLevels: [
+          'Inicio: domina controles y espacio.',
+          'Medio: planifica rutas antes de comer grandes cadenas.',
+          'Avanzado: evita bordes y practica maniobras cortas.'
+        ],
+        characters: {
+          'serpiente': 'Tu avatar que crece al comer; evita chocar.',
+          'comida': 'Elementos que aumentan longitud y puntaje.'
+        }
+      }
+    };
+
+    // ---- Estado ----
+    let selectedGame = null;
+
+    // ---- Utilidades ----
+    function escapeHtml(unsafe) {
+      return unsafe
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function addMessage(text, sender) {
+      const msg = document.createElement('div');
+      msg.classList.add('message', sender);
+      msg.innerHTML = text;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function showTyping() {
+      const t = document.createElement('div');
+      t.classList.add('message', 'bot', 'typing');
+      t.textContent = 'RegionalGame está escribiendo...';
+      chatBox.appendChild(t);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return t;
+    }
+
+    function normalize(s) {
+      return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    }
+
+    function capitalize(s) {
+      if (!s) return s;
+      return s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    }
+
+    // Busca coincidencia exacta/contigua de nombre de personaje en el texto
+    function detectCharacterInText(text) {
+      const q = ' ' + normalize(text) + ' ';
+      for (const gKey of Object.keys(gameData)) {
+        const chars = gameData[gKey].characters;
+        for (const key of Object.keys(chars)) {
+          const n = ' ' + normalize(key) + ' ';
+          if (q.includes(n) || q.includes(' ' + normalize(key) + 's ') || q.includes(normalize(key) + ' ') || q.includes(' ' + normalize(key))) {
+            return { game: gKey, name: key, info: chars[key] };
+          }
+        }
+      }
+      return null;
+    }
+
+    // ---- Generador de respuestas breves ----
+    function generateAnswer(raw) {
+      const text = raw.trim();
+      const lower = normalize(text);
+
+      // Prioriza pregunta por personaje
+      const char = detectCharacterInText(text);
+      if (char) {
+        return `<b>${capitalize(char.name)}</b> — ${char.info}`; // breve
+      }
+
+      // Detección de juego por mención
+      let target = null;
+      if (lower.includes('mario')) target = 'mario';
+      else if (lower.includes('pacman') || lower.includes('pac-man')) target = 'pacman';
+      else if (lower.includes('snake')) target = 'snake';
+
+      // Actual target = mención o selección
+      const gKey = target || selectedGame;
+
+      // Peticiones específicas (palabras clave)
+      if (lower.match(/\b(informaci|historia|que es|qué es|objetiv)/)) {
+        if (gKey) {
+          const g = gameData[gKey];
+          return `<b>${g.name} — Resumen:</b> ${g.overview}`; // breve
+        }
+        return '¿Sobre cuál juego quieres información? (Mario, Pac-Man o Snake).';
+      }
+
+      if (lower.match(/\b(personaje|personajes|lista)\b/)) {
+        if (gKey) {
+          const chars = Object.keys(gameData[gKey].characters).map(k => capitalize(k)).slice(0, 20);
+          return `<b>Personajes de ${gameData[gKey].name} (ej.):</b> ${chars.join(', ')}`; // lista corta
+        }
+        return 'Escribe "personajes de Mario", "personajes de Pac-Man" o elige un juego.';
+      }
+
+      if (lower.match(/\b(estrategi|consej|como avanzar|cómo avanzar|avanzar|tips)\b/)) {
+        if (gKey) {
+          const s = gameData[gKey].strategies.slice(0,3).join(' • ');
+          return `<b>Estrategia ${gameData[gKey].name}:</b> ${s}`; // breve
+        }
+        return '¿Quieres estrategias para Mario, Pac-Man o Snake? Elige un juego.';
+      }
+
+      if (lower.match(/\b(nivel|niveles|boss|jefe|cómo vencer|como vencer|vencer)\b/)) {
+        // Si es Bowser o fantasma incluido será detectado por character; si no:
+        if (gKey === 'mario') return 'Para niveles: conserva power-ups y memoriza patrones; frente a jefes espera el momento de ataque.';
+        if (gKey === 'pacman') return 'Para niveles: usa túneles y guarda Power Pellets para cuando estés rodeado.';
+        if (gKey === 'snake') return 'Para niveles/avance: planifica rutas y deja siempre una salida de escape.';
+        return '¿A qué juego te refieres? (Mario, Pac-Man o Snake).';
+      }
+
+      if (lower.match(/\b(puntaje|puntuacion|puntos|score)\b/)) {
+        if (gKey === 'pacman') return 'En Pac-Man, come frutas y fantasmas tras Power Pellets; prioriza combinaciones para puntajes altos.';
+        if (gKey === 'snake') return 'En Snake, maximiza rutas seguras para comer muchas piezas sin encerrarte.';
+        if (gKey === 'mario') return 'En Mario, colecciona monedas (100 = vida) y busca secretos para puntos extra.';
+        return '¿Sobre cuál juego quieres consejos de puntuación?';
+      }
+
+      // Si pregunta general por personaje sin palabra clave
+      if (lower.match(/\b(quien es|quién es|dime|¿quien|¿quién)\b/)) {
+        if (gKey) return `Pide "personajes de ${gameData[gKey].name}" o nombra directamente a un personaje.`;
+        return 'Puedes pedir "información", "personajes" o "estrategias" para Mario, Pac-Man o Snake.';
+      }
+
+      // Si el usuario sólo saluda
+      if (lower === 'hola' || lower.includes('hola') || lower.includes('buenas') || lower.includes('hey')) {
+        return '¡Hola! Elige un juego o pregunta: "información", "personajes" o "estrategias".';
+      }
+
+      // Si el usuario solo escribió el nombre de un juego (sin palabra)
+      if (target && !text.match(/\b(personaje|estrateg|info|historia|nivel|puntaje)\b/)) {
+        const d = gameData[target];
+        return `<b>${d.name} —</b> ${d.overview}`;
+      }
+
+      // Uso del juego seleccionado si existe
+      if (selectedGame && !target) {
+        // sugerencia breve sobre cómo preguntar
+        return `Sobre ${gameData[selectedGame].name}: pide "información", "personajes" o "estrategias".`;
+      }
+
+      // Respuesta por defecto breve
+      return 'No entendí bien; pide "información", "personajes" o "estrategias" para Mario, Pac-Man o Snake.';
+    }
+
+    // ---- Lógica de interacción ----
+    async function gameBotReply(userText) {
+      const typing = showTyping();
+      await new Promise(r => setTimeout(r, 450)); // pausa corta
+      typing.remove();
+      const answer = generateAnswer(userText);
+      addMessage(answer, 'bot');
+    }
+
+    function handleSend() {
+      const text = input.value.trim();
+      if (!text) return;
+      addMessage(escapeHtml(text), 'user');
+
+      // Actualizar selección si mencionan el juego explícitamente
+      const nl = normalize(text);
+      if (nl.includes('mario')) selectGameUI('mario');
+      else if (nl.includes('pacman') || nl.includes('pac-man')) selectGameUI('pacman');
+      else if (nl.includes('snake')) selectGameUI('snake');
+
+      gameBotReply(text);
+      input.value = '';
+    }
+
+    sendBtn.addEventListener('click', handleSend);
+    input.addEventListener('keypress', e => { if (e.key === 'Enter') handleSend(); });
+
+    // ---- Botones de selección ----
+    function selectGameUI(gameKey) {
+      selectedGame = gameKey;
+      document.querySelectorAll('.game-btn').forEach(b => {
+        if (b.dataset.game === gameKey) b.classList.add('selected'); else b.classList.remove('selected');
+      });
+    }
+
+    document.querySelectorAll('.game-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const g = btn.dataset.game;
+        selectGameUI(g);
+        const greetings = {
+          mario: '🍄 Seleccionado Mario. Pide "información", "personajes" o "estrategias".',
+          pacman: '👻 Seleccionado Pac-Man. Pide "información", "personajes" o "estrategias".',
+          snake: '🐍 Seleccionado Snake. Pide "información", "personajes" o "estrategias".'
+        };
+        addMessage(greetings[g], 'bot');
+      });
+    });
+
+    // ---- FIN ----
+  </script>
+</body>
+</html>

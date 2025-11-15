@@ -1,0 +1,1950 @@
+<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake Realista</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a4d2e 0%, #0d2818 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        main {
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        @media (min-width: 1200px) {
+            main {
+                max-width: 1100px;
+                padding: 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            main {
+                padding: 10px;
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            main {
+                padding: 5px;
+            }
+        }
+
+        .game-container {
+            background: linear-gradient(145deg, #1a3a2e 0%, #0f2419 100%);
+            border: 4px solid #4CAF50;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 0 40px rgba(76, 175, 80, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                padding: 12px;
+                border-width: 3px;
+                border-radius: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .game-container {
+                padding: 8px;
+                border-width: 2px;
+                border-radius: 8px;
+            }
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .game-title {
+            font-size: 36px;
+            color: #4CAF50;
+            text-shadow: 0 0 20px rgba(76, 175, 80, 0.8), 3px 3px 6px rgba(0, 0, 0, 0.5);
+            margin: 0 0 10px 0;
+            font-weight: bold;
+            letter-spacing: 3px;
+        }
+
+        @media (min-width: 1200px) {
+            .game-title {
+                font-size: 44px;
+                margin: 0 0 15px 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .game-title {
+                font-size: 22px;
+                margin: 0 0 8px 0;
+                letter-spacing: 2px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .game-title {
+                font-size: 18px;
+                margin: 0 0 6px 0;
+                letter-spacing: 1px;
+            }
+        }
+
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: linear-gradient(145deg, rgba(76, 175, 80, 0.2), rgba(56, 142, 60, 0.2));
+            border-radius: 12px;
+            border: 2px solid rgba(76, 175, 80, 0.3);
+            flex-wrap: wrap;
+            gap: 10px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (min-width: 1200px) {
+            .hud {
+                font-size: 16px;
+                padding: 18px;
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hud {
+                font-size: 10px;
+                padding: 10px;
+                gap: 6px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hud {
+                font-size: 9px;
+                padding: 8px;
+                gap: 4px;
+            }
+        }
+
+        .hud-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .hud-label {
+            color: #81C784;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hud-value {
+            font-size: 20px;
+            color: #fff;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
+        }
+
+        @media (min-width: 1200px) {
+            .hud-value {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hud-value {
+                font-size: 14px;
+            }
+            .hud-label {
+                font-size: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hud-value {
+                font-size: 12px;
+            }
+            .hud-label {
+                font-size: 7px;
+            }
+        }
+
+        #gameCanvas {
+            display: block;
+            margin: 0 auto;
+            background: linear-gradient(145deg, #0a1f14 0%, #051209 100%);
+            border: 3px solid #2E7D32;
+            border-radius: 12px;
+            max-width: 100%;
+            width: 100%;
+            height: auto;
+            box-shadow: 0 0 30px rgba(76, 175, 80, 0.3), inset 0 0 50px rgba(0, 0, 0, 0.5);
+            touch-action: none;
+        }
+
+        @media (min-width: 1200px) {
+            #gameCanvas {
+                border-width: 4px;
+                border-radius: 16px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #gameCanvas {
+                border-width: 2px;
+                border-radius: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #gameCanvas {
+                border-width: 2px;
+                border-radius: 8px;
+            }
+        }
+
+        .game-controls {
+            margin-top: 20px;
+            text-align: center;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .game-controls {
+                gap: 8px;
+                margin-top: 12px;
+            }
+        }
+
+        .btn {
+            background: linear-gradient(145deg, #4CAF50 0%, #388E3C 100%);
+            color: #fff;
+            border: none;
+            padding: 14px 32px;
+            font-size: 14px;
+            font-family: 'Segoe UI', sans-serif;
+            cursor: pointer;
+            border-radius: 10px;
+            box-shadow: 0 6px 0 #2E7D32, 0 8px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.15s;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @media (min-width: 1200px) {
+            .btn {
+                font-size: 16px;
+                padding: 16px 40px;
+                box-shadow: 0 7px 0 #2E7D32, 0 10px 25px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .btn {
+                font-size: 10px;
+                padding: 10px 20px;
+                box-shadow: 0 4px 0 #2E7D32, 0 6px 15px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .btn {
+                font-size: 9px;
+                padding: 8px 16px;
+                box-shadow: 0 3px 0 #2E7D32, 0 5px 12px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        .btn:hover {
+            background: linear-gradient(145deg, #66BB6A 0%, #4CAF50 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #2E7D32, 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 3px 0 #2E7D32, 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:disabled {
+            background: linear-gradient(145deg, #666 0%, #444 100%);
+            cursor: not-allowed;
+            box-shadow: 0 4px 0 #333;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(145deg, #FF9800 0%, #F57C00 100%);
+            box-shadow: 0 6px 0 #E65100, 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(145deg, #FFB74D 0%, #FF9800 100%);
+            box-shadow: 0 8px 0 #E65100, 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-secondary:active {
+            box-shadow: 0 3px 0 #E65100, 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(145deg, #F44336 0%, #D32F2F 100%);
+            box-shadow: 0 6px 0 #B71C1C, 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(145deg, #EF5350 0%, #F44336 100%);
+            box-shadow: 0 8px 0 #B71C1C, 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-danger:active {
+            box-shadow: 0 3px 0 #B71C1C, 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .circular-control {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 20px auto;
+            display: none;
+        }
+
+        @media (max-width: 1023px) {
+            .circular-control {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .circular-control {
+                width: 160px;
+                height: 160px;
+                margin: 15px auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .circular-control {
+                width: 140px;
+                height: 140px;
+                margin: 12px auto;
+            }
+        }
+
+        .control-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(145deg, rgba(76, 175, 80, 0.3), rgba(56, 142, 60, 0.3));
+            border: 4px solid #4CAF50;
+            box-shadow: 0 0 30px rgba(76, 175, 80, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .control-btn-circular {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(145deg, #4CAF50, #388E3C);
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #2E7D32, 0 6px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        @media (max-width: 768px) {
+            .control-btn-circular {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .control-btn-circular {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+        }
+
+        .control-btn-circular:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #2E7D32, 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-up { top: 0; left: 50%; transform: translateX(-50%); }
+        .control-down { bottom: 0; left: 50%; transform: translateX(-50%); }
+        .control-left { left: 0; top: 50%; transform: translateY(-50%); }
+        .control-right { right: 0; top: 50%; transform: translateY(-50%); }
+
+        .control-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(145deg, #2E7D32, #1B5E20);
+            border-radius: 50%;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4CAF50;
+            font-size: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .control-center {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .control-center {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+        }
+
+        .instructions {
+            margin-top: 15px;
+            color: #81C784;
+            font-size: 11px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .enemy-indicator {
+            display: inline-block;
+            padding: 4px 10px;
+            background: linear-gradient(145deg, #F44336, #D32F2F);
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            margin: 0 5px;
+            box-shadow: 0 2px 8px rgba(244, 67, 54, 0.4);
+        }
+
+        @media (min-width: 1200px) {
+            .instructions {
+                font-size: 13px;
+                margin-top: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .instructions {
+                font-size: 8px;
+                margin-top: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .instructions {
+                font-size: 7px;
+                margin-top: 8px;
+            }
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .overlay-content {
+            text-align: center;
+            color: #fff;
+            padding: 40px;
+            background: linear-gradient(145deg, #1a3a2e, #0f2419);
+            border: 4px solid #4CAF50;
+            border-radius: 16px;
+            box-shadow: 0 0 50px rgba(76, 175, 80, 0.6), inset 0 0 30px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+        }
+
+        @media (min-width: 1200px) {
+            .overlay-content {
+                padding: 50px;
+                max-width: 600px;
+                border-width: 5px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .overlay-content {
+                padding: 25px;
+                max-width: 90%;
+                border-width: 3px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .overlay-content {
+                padding: 20px;
+                max-width: 92%;
+                border-width: 2px;
+            }
+        }
+
+        .overlay-title {
+            font-size: 32px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(76, 175, 80, 0.8), 3px 3px 6px rgba(0, 0, 0, 0.5);
+            font-weight: bold;
+        }
+
+        @media (min-width: 1200px) {
+            .overlay-title {
+                font-size: 40px;
+                margin-bottom: 25px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .overlay-title {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .overlay-title {
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
+        }
+
+        .overlay-message {
+            font-size: 16px;
+            color: #81C784;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        @media (min-width: 1200px) {
+            .overlay-message {
+                font-size: 18px;
+                margin-bottom: 35px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .overlay-message {
+                font-size: 11px;
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .overlay-message {
+                font-size: 10px;
+                margin-bottom: 15px;
+            }
+        }
+
+        .settings-panel {
+            background: linear-gradient(145deg, rgba(76, 175, 80, 0.15), rgba(56, 142, 60, 0.15));
+            border: 2px solid rgba(76, 175, 80, 0.3);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .settings-panel {
+                padding: 15px;
+            }
+        }
+
+        .setting-item {
+            margin-bottom: 25px;
+        }
+
+        .setting-label {
+            color: #4CAF50;
+            font-size: 14px;
+            margin-bottom: 12px;
+            display: block;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 768px) {
+            .setting-label {
+                font-size: 11px;
+            }
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .slider {
+            flex: 1;
+            height: 10px;
+            border-radius: 5px;
+            background: linear-gradient(145deg, #1a3a2e, #0f2419);
+            outline: none;
+            -webkit-appearance: none;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #4CAF50, #388E3C);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.6), 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #4CAF50, #388E3C);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.6), 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .slider-value {
+            color: #fff;
+            font-size: 16px;
+            min-width: 50px;
+            text-align: right;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            .slider-value {
+                font-size: 12px;
+                min-width: 40px;
+            }
+        }
+
+        .snake-preview {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .snake-option {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .snake-option:hover {
+            transform: scale(1.1);
+            border-color: #4CAF50;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
+        }
+
+        .snake-option.selected {
+            border-color: #4CAF50;
+            box-shadow: 0 0 25px rgba(76, 175, 80, 0.8);
+        }
+
+        .pause-overlay {
+            background: rgba(0, 0, 0, 0.85);
+        }
+
+        .pause-overlay .overlay-content {
+            border-color: #FF9800;
+            box-shadow: 0 0 50px rgba(255, 152, 0, 0.6);
+        }
+
+        .level-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: linear-gradient(145deg, #FF9800, #F57C00);
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(255, 152, 0, 0.4);
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .level-badge {
+                padding: 6px 12px;
+                font-size: 10px;
+            }
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <main>
+   <div class="game-container">
+    <header class="game-header">
+     <h1 class="game-title" id="gameTitle">🐍 SNAKE REALISTA 🐍</h1>
+    </header>
+    <div class="hud">
+     <div class="hud-item"><span class="hud-label">Puntos</span> <span class="hud-value" id="score">0</span>
+     </div>
+     <div class="hud-item"><span class="hud-label">Nivel</span> <span class="hud-value" id="level">1</span>
+     </div>
+     <div class="hud-item"><span class="hud-label">Longitud</span> <span class="hud-value" id="length">3</span>
+     </div>
+     <div class="hud-item"><span class="hud-label">Enemigos</span> <span class="hud-value" id="enemies">0</span>
+     </div>
+     <div class="hud-item"><span class="hud-label">Récord</span> <span class="hud-value" id="highScore">0</span>
+     </div>
+    </div>
+    <canvas id="gameCanvas" width="600" height="600"></canvas>
+    <div class="circular-control">
+     <div class="control-circle"><button class="control-btn-circular control-up" id="btnUp">▲</button> <button class="control-btn-circular control-down" id="btnDown">▼</button> <button class="control-btn-circular control-left" id="btnLeft">◄</button> <button class="control-btn-circular control-right" id="btnRight">►</button>
+      <div class="control-center">
+       🐍
+      </div>
+     </div>
+    </div>
+    <div class="game-controls"><button class="btn" id="startBtn">INICIAR JUEGO</button> <button class="btn btn-secondary" id="pauseBtn" disabled>PAUSAR</button> <button class="btn btn-danger" id="restartGameBtn" disabled>REINICIAR</button> <button class="btn btn-secondary" id="settingsBtn">AJUSTES</button>
+    </div>
+    <div class="instructions">
+     🎮 Usa las flechas del teclado o el control circular para mover la serpiente<br>
+      🍎 Come las frutas para crecer y ganar puntos<br>
+      🐍 ¡Cuidado! Serpientes enemigas intentarán comerte - ¡Cómelas tú primero!<br>
+      ⚡ Cada nivel aumenta la velocidad, enemigos y complejidad<br>
+      🏆 ¡Alcanza el nivel 100 para la victoria total!
+    </div>
+   </div><!-- Pantalla de Bienvenida -->
+   <div class="overlay" id="welcomeOverlay">
+    <div class="overlay-content">
+     <div class="overlay-title" id="welcomeTitle">
+      UNIVERSIDAD REGIONAL
+     </div>
+     <div class="overlay-message" id="welcomeMessage">
+      te invita a jugar conmigo
+     </div><button class="btn" id="welcomeStartBtn">INICIAR JUEGO</button>
+    </div>
+   </div><!-- Pantalla de Ajustes -->
+   <div class="overlay" id="settingsOverlay">
+    <div class="overlay-content">
+     <div class="overlay-title">
+      ⚙️ AJUSTES
+     </div>
+     <div class="settings-panel">
+      <div class="setting-item"><label class="setting-label">🔊 Volumen</label>
+       <div class="slider-container"><input type="range" min="0" max="100" value="50" class="slider" id="volumeSlider"> <span class="slider-value" id="volumeValue">50%</span>
+       </div>
+      </div>
+      <div class="setting-item"><label class="setting-label">⚡ Velocidad Base</label>
+       <div class="slider-container"><input type="range" min="50" max="200" value="100" class="slider" id="speedSlider"> <span class="slider-value" id="speedValue">100%</span>
+       </div>
+      </div>
+      <div class="setting-item"><label class="setting-label">🐍 Estilo de Serpiente</label>
+       <div class="snake-preview" id="snakePreview"></div>
+      </div>
+     </div><button class="btn" id="closeSettingsBtn">CERRAR</button>
+    </div>
+   </div><!-- Pantalla de Pausa -->
+   <div class="overlay pause-overlay" id="pauseOverlay">
+    <div class="overlay-content">
+     <div class="overlay-title">
+      ⏸️ PAUSA
+     </div>
+     <div class="overlay-message">
+      El juego está pausado
+     </div>
+     <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;"><button class="btn" id="resumeBtn">CONTINUAR</button> <button class="btn btn-danger" id="quitBtn">SALIR</button>
+     </div>
+    </div>
+   </div><!-- Pantalla de Game Over -->
+   <div class="overlay" id="gameOverOverlay">
+    <div class="overlay-content">
+     <div class="overlay-title" id="gameOverText" style="color: #F44336; text-shadow: 0 0 20px rgba(244, 67, 54, 0.8);">
+      GAME OVER
+     </div>
+     <div class="level-badge">
+      NIVEL ALCANZADO: <span id="finalLevel">1</span>
+     </div>
+     <div class="overlay-message" style="font-size: 20px; color: #FFD700;">
+      PUNTUACIÓN FINAL: <span id="finalScore">0</span>
+     </div>
+     <div class="overlay-message" style="font-size: 16px;">
+      LONGITUD: <span id="finalLength">3</span> segmentos
+     </div><button class="btn" id="restartBtn">JUGAR DE NUEVO</button>
+    </div>
+   </div><!-- Pantalla de Nivel Completado -->
+   <div class="overlay" id="levelCompleteOverlay">
+    <div class="overlay-content">
+     <div class="overlay-title" style="color: #FFD700; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);">
+      🎉 ¡NIVEL COMPLETADO! 🎉
+     </div>
+     <div class="level-badge">
+      NIVEL: <span id="completedLevel">1</span>
+     </div>
+     <div class="overlay-message" style="font-size: 18px;">
+      PUNTOS: <span id="levelScore">0</span>
+     </div>
+     <div class="overlay-message">
+      ¡Prepárate! El siguiente nivel será más rápido
+     </div><button class="btn" id="nextLevelBtn">SIGUIENTE NIVEL</button>
+    </div>
+   </div>
+  </main>
+  <script>
+        const defaultConfig = {
+            welcome_title: "UNIVERSIDAD REGIONAL",
+            welcome_message: "te invita a jugar conmigo",
+            game_title: "🐍 SNAKE REALISTA 🐍",
+            start_button_text: "INICIAR JUEGO",
+            game_over_text: "GAME OVER"
+        };
+
+        // Sistema de Audio Mejorado
+        class AudioManager {
+            constructor() {
+                this.volume = 0.5;
+                this.audioContext = null;
+                this.backgroundMusic = null;
+                this.musicGainNode = null;
+                this.musicInterval = null;
+            }
+
+            init() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.log('Audio no disponible');
+                }
+            }
+
+            setVolume(volume) {
+                this.volume = volume / 100;
+                if (this.musicGainNode) {
+                    this.musicGainNode.gain.value = this.volume * 0.15;
+                }
+            }
+
+            playBackgroundMusic() {
+                if (!this.audioContext || this.musicInterval) return;
+
+                this.musicGainNode = this.audioContext.createGain();
+                this.musicGainNode.gain.value = this.volume * 0.15;
+                this.musicGainNode.connect(this.audioContext.destination);
+
+                const melodyNotes = [
+                    { freq: 392, duration: 0.2 },
+                    { freq: 440, duration: 0.2 },
+                    { freq: 494, duration: 0.2 },
+                    { freq: 523, duration: 0.3 },
+                    { freq: 494, duration: 0.2 },
+                    { freq: 440, duration: 0.2 },
+                    { freq: 392, duration: 0.3 }
+                ];
+
+                let noteIndex = 0;
+                this.musicInterval = setInterval(() => {
+                    const note = melodyNotes[noteIndex];
+                    const osc = this.audioContext.createOscillator();
+                    const gain = this.audioContext.createGain();
+                    
+                    osc.connect(gain);
+                    gain.connect(this.musicGainNode);
+                    
+                    osc.frequency.value = note.freq;
+                    osc.type = 'sine';
+                    gain.gain.value = 0.3;
+                    
+                    const now = this.audioContext.currentTime;
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + note.duration);
+                    
+                    osc.start(now);
+                    osc.stop(now + note.duration);
+                    
+                    noteIndex = (noteIndex + 1) % melodyNotes.length;
+                }, 300);
+            }
+
+            stopBackgroundMusic() {
+                if (this.musicInterval) {
+                    clearInterval(this.musicInterval);
+                    this.musicInterval = null;
+                }
+            }
+
+            playSound(type) {
+                if (!this.audioContext) return;
+
+                const now = this.audioContext.currentTime;
+
+                switch(type) {
+                    case 'eat':
+                        const eatOsc = this.audioContext.createOscillator();
+                        const eatGain = this.audioContext.createGain();
+                        eatOsc.connect(eatGain);
+                        eatGain.connect(this.audioContext.destination);
+                        eatOsc.frequency.value = 800;
+                        eatOsc.type = 'sine';
+                        eatGain.gain.value = this.volume * 0.3;
+                        eatGain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                        eatOsc.start(now);
+                        eatOsc.stop(now + 0.1);
+                        break;
+
+                    case 'death':
+                        const deathFreqs = [400, 350, 300, 250, 200, 150, 100, 50];
+                        deathFreqs.forEach((freq, i) => {
+                            const deathOsc = this.audioContext.createOscillator();
+                            const deathGain = this.audioContext.createGain();
+                            deathOsc.connect(deathGain);
+                            deathGain.connect(this.audioContext.destination);
+                            deathOsc.frequency.value = freq;
+                            deathOsc.type = 'sawtooth';
+                            deathGain.gain.value = this.volume * 0.2;
+                            const startTime = now + (i * 0.08);
+                            deathGain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.1);
+                            deathOsc.start(startTime);
+                            deathOsc.stop(startTime + 0.1);
+                        });
+                        break;
+
+                    case 'levelUp':
+                        const levelFreqs = [523, 659, 784, 1047, 1319];
+                        levelFreqs.forEach((freq, i) => {
+                            const levelOsc = this.audioContext.createOscillator();
+                            const levelGain = this.audioContext.createGain();
+                            levelOsc.connect(levelGain);
+                            levelGain.connect(this.audioContext.destination);
+                            levelOsc.frequency.value = freq;
+                            levelOsc.type = 'square';
+                            levelGain.gain.value = this.volume * 0.25;
+                            const startTime = now + (i * 0.12);
+                            levelGain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.15);
+                            levelOsc.start(startTime);
+                            levelOsc.stop(startTime + 0.15);
+                        });
+                        break;
+                }
+            }
+        }
+
+        // Estilos de Serpiente Realistas
+        const snakeStyles = [
+            {
+                name: 'Serpiente Verde',
+                colors: ['#2E7D32', '#388E3C', '#43A047', '#4CAF50'],
+                pattern: 'scales',
+                eyeColor: '#FFD700'
+            },
+            {
+                name: 'Pitón Real',
+                colors: ['#8B4513', '#A0522D', '#CD853F', '#DEB887'],
+                pattern: 'python',
+                eyeColor: '#FF6B00'
+            },
+            {
+                name: 'Cobra',
+                colors: ['#1A1A1A', '#2C2C2C', '#3D3D3D', '#4F4F4F'],
+                pattern: 'cobra',
+                eyeColor: '#FF0000'
+            },
+            {
+                name: 'Serpiente de Coral',
+                colors: ['#FF0000', '#FFD700', '#000000', '#FF0000'],
+                pattern: 'coral',
+                eyeColor: '#000000'
+            },
+            {
+                name: 'Anaconda',
+                colors: ['#2F4F2F', '#556B2F', '#6B8E23', '#808000'],
+                pattern: 'anaconda',
+                eyeColor: '#FFFF00'
+            }
+        ];
+
+        // Clase para Serpientes Enemigas con IA
+        class EnemySnake {
+            constructor(tileCount, styleIndex, startX, startY) {
+                this.tileCount = tileCount;
+                this.styleIndex = styleIndex;
+                this.body = [
+                    { x: startX, y: startY },
+                    { x: startX - 1, y: startY },
+                    { x: startX - 2, y: startY }
+                ];
+                this.direction = { x: 1, y: 0 };
+                this.nextDirection = { x: 1, y: 0 };
+                this.moveCounter = 0;
+                this.moveDelay = 2; // Se mueve cada 2 frames
+                this.targetChangeCounter = 0;
+                this.currentTarget = null;
+                this.aggressiveness = Math.random() * 0.5 + 0.5; // 0.5 a 1.0
+            }
+
+            findNearestTarget(playerSnake, food, otherEnemies) {
+                const head = this.body[0];
+                let targets = [];
+
+                // Agregar comida como objetivo
+                targets.push({ 
+                    pos: food, 
+                    priority: 1,
+                    type: 'food'
+                });
+
+                // Agregar cabeza del jugador si es más pequeño
+                if (this.body.length > playerSnake.length * 0.7) {
+                    targets.push({ 
+                        pos: playerSnake[0], 
+                        priority: 2 * this.aggressiveness,
+                        type: 'player'
+                    });
+                }
+
+                // Agregar otras serpientes enemigas más pequeñas
+                otherEnemies.forEach(enemy => {
+                    if (enemy !== this && this.body.length > enemy.body.length) {
+                        targets.push({ 
+                            pos: enemy.body[0], 
+                            priority: 1.5 * this.aggressiveness,
+                            type: 'enemy'
+                        });
+                    }
+                });
+
+                // Encontrar el objetivo más cercano ponderado por prioridad
+                let bestTarget = null;
+                let bestScore = Infinity;
+
+                targets.forEach(target => {
+                    const distance = Math.abs(head.x - target.pos.x) + Math.abs(head.y - target.pos.y);
+                    const score = distance / target.priority;
+                    if (score < bestScore) {
+                        bestScore = score;
+                        bestTarget = target.pos;
+                    }
+                });
+
+                return bestTarget;
+            }
+
+            calculateDirection(target, obstacles, allSnakes) {
+                if (!target) return;
+
+                const head = this.body[0];
+                const possibleDirections = [
+                    { x: 0, y: -1 }, // Arriba
+                    { x: 0, y: 1 },  // Abajo
+                    { x: -1, y: 0 }, // Izquierda
+                    { x: 1, y: 0 }   // Derecha
+                ];
+
+                // Filtrar direcciones opuestas
+                const validDirections = possibleDirections.filter(dir => {
+                    return !(dir.x === -this.direction.x && dir.y === -this.direction.y);
+                });
+
+                // Evaluar cada dirección
+                let bestDirection = this.direction;
+                let bestScore = -Infinity;
+
+                validDirections.forEach(dir => {
+                    const newHead = {
+                        x: (head.x + dir.x + this.tileCount) % this.tileCount,
+                        y: (head.y + dir.y + this.tileCount) % this.tileCount
+                    };
+
+                    // Calcular puntuación
+                    let score = 0;
+
+                    // Distancia al objetivo (menor es mejor)
+                    const distanceToTarget = Math.abs(newHead.x - target.x) + Math.abs(newHead.y - target.y);
+                    score -= distanceToTarget * 10;
+
+                    // Penalizar colisiones
+                    let collision = false;
+
+                    // Colisión con obstáculos
+                    if (obstacles.some(obs => obs.x === newHead.x && obs.y === newHead.y)) {
+                        score -= 1000;
+                        collision = true;
+                    }
+
+                    // Colisión con cuerpos de serpientes
+                    allSnakes.forEach(snake => {
+                        if (snake.some(segment => segment.x === newHead.x && segment.y === newHead.y)) {
+                            score -= 1000;
+                            collision = true;
+                        }
+                    });
+
+                    // Bonus por mantener la dirección actual
+                    if (dir.x === this.direction.x && dir.y === this.direction.y) {
+                        score += 5;
+                    }
+
+                    // Evitar esquinas (mirar 2 pasos adelante)
+                    if (!collision) {
+                        const nextHead = {
+                            x: (newHead.x + dir.x + this.tileCount) % this.tileCount,
+                            y: (newHead.y + dir.y + this.tileCount) % this.tileCount
+                        };
+                        
+                        let futureCollision = false;
+                        allSnakes.forEach(snake => {
+                            if (snake.some(segment => segment.x === nextHead.x && segment.y === nextHead.y)) {
+                                futureCollision = true;
+                            }
+                        });
+                        
+                        if (futureCollision) {
+                            score -= 50;
+                        }
+                    }
+
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestDirection = dir;
+                    }
+                });
+
+                this.nextDirection = bestDirection;
+            }
+
+            move(playerSnake, food, obstacles, otherEnemies) {
+                this.moveCounter++;
+                if (this.moveCounter < this.moveDelay) return false;
+                this.moveCounter = 0;
+
+                // Actualizar objetivo cada cierto tiempo
+                this.targetChangeCounter++;
+                if (this.targetChangeCounter > 10 || !this.currentTarget) {
+                    this.currentTarget = this.findNearestTarget(playerSnake, food, otherEnemies);
+                    this.targetChangeCounter = 0;
+                }
+
+                // Calcular dirección hacia el objetivo
+                const allSnakes = [this.body, playerSnake, ...otherEnemies.map(e => e.body)];
+                this.calculateDirection(this.currentTarget, obstacles, allSnakes);
+
+                this.direction = this.nextDirection;
+
+                const head = {
+                    x: (this.body[0].x + this.direction.x + this.tileCount) % this.tileCount,
+                    y: (this.body[0].y + this.direction.y + this.tileCount) % this.tileCount
+                };
+
+                this.body.unshift(head);
+                this.body.pop();
+
+                return true;
+            }
+
+            grow() {
+                const tail = this.body[this.body.length - 1];
+                this.body.push({ ...tail });
+            }
+
+            checkCollision(x, y) {
+                return this.body.some(segment => segment.x === x && segment.y === y);
+            }
+        }
+
+        class SnakeGame {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.gridSize = 20;
+                this.tileCount = 30;
+                this.audioManager = new AudioManager();
+                this.audioManager.init();
+
+                this.snake = [];
+                this.direction = { x: 1, y: 0 };
+                this.nextDirection = { x: 1, y: 0 };
+                this.food = { x: 0, y: 0 };
+                this.score = 0;
+                this.level = 1;
+                this.highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
+                this.gameRunning = false;
+                this.gamePaused = false;
+                this.baseSpeed = 150;
+                this.currentSpeed = 150;
+                this.speedMultiplier = 1;
+                this.gameLoop = null;
+                this.currentSnakeStyle = 0;
+                this.obstacles = [];
+                this.enemySnakes = [];
+                this.enemiesKilled = 0;
+
+                this.initSnake();
+                this.spawnFood();
+                this.setupControls();
+                this.updateHUD();
+                this.createSnakePreview();
+            }
+
+            initSnake() {
+                this.snake = [
+                    { x: 15, y: 15 },
+                    { x: 14, y: 15 },
+                    { x: 13, y: 15 }
+                ];
+            }
+
+            createSnakePreview() {
+                const preview = document.getElementById('snakePreview');
+                preview.innerHTML = '';
+                
+                snakeStyles.forEach((style, index) => {
+                    const option = document.createElement('div');
+                    option.className = 'snake-option';
+                    if (index === this.currentSnakeStyle) {
+                        option.classList.add('selected');
+                    }
+                    
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 60;
+                    canvas.height = 60;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Dibujar preview de la serpiente
+                    for (let i = 0; i < 3; i++) {
+                        const gradient = ctx.createLinearGradient(0, 0, 60, 60);
+                        gradient.addColorStop(0, style.colors[i % style.colors.length]);
+                        gradient.addColorStop(1, style.colors[(i + 1) % style.colors.length]);
+                        ctx.fillStyle = gradient;
+                        ctx.fillRect(10 + i * 15, 20, 15, 20);
+                        ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(10 + i * 15, 20, 15, 20);
+                    }
+                    
+                    option.appendChild(canvas);
+                    option.addEventListener('click', () => {
+                        this.currentSnakeStyle = index;
+                        document.querySelectorAll('.snake-option').forEach(opt => {
+                            opt.classList.remove('selected');
+                        });
+                        option.classList.add('selected');
+                    });
+                    
+                    preview.appendChild(option);
+                });
+            }
+
+            setupControls() {
+                document.addEventListener('keydown', (e) => {
+                    if (!this.gameRunning || this.gamePaused) return;
+                    
+                    switch(e.key) {
+                        case 'ArrowUp':
+                            e.preventDefault();
+                            if (this.direction.y === 0) {
+                                this.nextDirection = { x: 0, y: -1 };
+                            }
+                            break;
+                        case 'ArrowDown':
+                            e.preventDefault();
+                            if (this.direction.y === 0) {
+                                this.nextDirection = { x: 0, y: 1 };
+                            }
+                            break;
+                        case 'ArrowLeft':
+                            e.preventDefault();
+                            if (this.direction.x === 0) {
+                                this.nextDirection = { x: -1, y: 0 };
+                            }
+                            break;
+                        case 'ArrowRight':
+                            e.preventDefault();
+                            if (this.direction.x === 0) {
+                                this.nextDirection = { x: 1, y: 0 };
+                            }
+                            break;
+                    }
+                });
+
+                // Controles circulares
+                const setupControl = (btnId, dir) => {
+                    const btn = document.getElementById(btnId);
+                    const setDir = (e) => {
+                        e.preventDefault();
+                        if (!this.gameRunning || this.gamePaused) return;
+                        
+                        if ((dir.x !== 0 && this.direction.x === 0) || 
+                            (dir.y !== 0 && this.direction.y === 0)) {
+                            this.nextDirection = dir;
+                        }
+                    };
+                    btn.addEventListener('touchstart', setDir, { passive: false });
+                    btn.addEventListener('click', setDir);
+                };
+                
+                setupControl('btnUp', { x: 0, y: -1 });
+                setupControl('btnDown', { x: 0, y: 1 });
+                setupControl('btnLeft', { x: -1, y: 0 });
+                setupControl('btnRight', { x: 1, y: 0 });
+            }
+
+            spawnFood() {
+                let validPosition = false;
+                while (!validPosition) {
+                    this.food = {
+                        x: Math.floor(Math.random() * this.tileCount),
+                        y: Math.floor(Math.random() * this.tileCount)
+                    };
+                    
+                    validPosition = !this.snake.some(segment => 
+                        segment.x === this.food.x && segment.y === this.food.y
+                    ) && !this.obstacles.some(obs => 
+                        obs.x === this.food.x && obs.y === this.food.y
+                    );
+                }
+            }
+
+            generateObstacles() {
+                this.obstacles = [];
+                const obstacleCount = Math.min(Math.floor(this.level / 5), 15);
+                
+                for (let i = 0; i < obstacleCount; i++) {
+                    let validPosition = false;
+                    let obstacle;
+                    
+                    while (!validPosition) {
+                        obstacle = {
+                            x: Math.floor(Math.random() * this.tileCount),
+                            y: Math.floor(Math.random() * this.tileCount)
+                        };
+                        
+                        const distanceFromCenter = Math.abs(obstacle.x - 15) + Math.abs(obstacle.y - 15);
+                        validPosition = distanceFromCenter > 5 && 
+                            !this.snake.some(segment => segment.x === obstacle.x && segment.y === obstacle.y) &&
+                            !this.obstacles.some(obs => obs.x === obstacle.x && obs.y === obstacle.y);
+                    }
+                    
+                    this.obstacles.push(obstacle);
+                }
+            }
+
+            generateEnemySnakes() {
+                this.enemySnakes = [];
+                // Número de enemigos aumenta con el nivel (1-5 enemigos)
+                const enemyCount = Math.min(Math.floor(this.level / 10) + 1, 5);
+                
+                for (let i = 0; i < enemyCount; i++) {
+                    let validPosition = false;
+                    let startX, startY;
+                    
+                    while (!validPosition) {
+                        startX = Math.floor(Math.random() * (this.tileCount - 6)) + 3;
+                        startY = Math.floor(Math.random() * (this.tileCount - 6)) + 3;
+                        
+                        // Asegurar que esté lejos del jugador
+                        const distanceFromPlayer = Math.abs(startX - 15) + Math.abs(startY - 15);
+                        validPosition = distanceFromPlayer > 10;
+                        
+                        // Verificar que no colisione con obstáculos
+                        if (validPosition) {
+                            for (let j = 0; j < 3; j++) {
+                                if (this.obstacles.some(obs => obs.x === startX - j && obs.y === startY)) {
+                                    validPosition = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Usar diferentes estilos para cada enemigo (evitar el estilo del jugador)
+                    let styleIndex = (this.currentSnakeStyle + i + 1) % snakeStyles.length;
+                    const enemy = new EnemySnake(this.tileCount, styleIndex, startX, startY);
+                    this.enemySnakes.push(enemy);
+                }
+            }
+
+            move() {
+                this.direction = this.nextDirection;
+                
+                const head = {
+                    x: this.snake[0].x + this.direction.x,
+                    y: this.snake[0].y + this.direction.y
+                };
+
+                // Atravesar paredes
+                if (head.x < 0) head.x = this.tileCount - 1;
+                if (head.x >= this.tileCount) head.x = 0;
+                if (head.y < 0) head.y = this.tileCount - 1;
+                if (head.y >= this.tileCount) head.y = 0;
+
+                // Colisión con el cuerpo
+                if (this.snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                    this.endGame();
+                    return;
+                }
+
+                // Colisión con obstáculos
+                if (this.obstacles.some(obs => obs.x === head.x && obs.y === head.y)) {
+                    this.endGame();
+                    return;
+                }
+
+                // Colisión con cuerpos de serpientes enemigas
+                for (let enemy of this.enemySnakes) {
+                    if (enemy.checkCollision(head.x, head.y)) {
+                        this.endGame();
+                        return;
+                    }
+                }
+
+                this.snake.unshift(head);
+
+                // Verificar si comió una serpiente enemiga
+                let ateEnemy = false;
+                this.enemySnakes = this.enemySnakes.filter(enemy => {
+                    const enemyHead = enemy.body[0];
+                    if (head.x === enemyHead.x && head.y === enemyHead.y) {
+                        // El jugador come al enemigo si es más grande
+                        if (this.snake.length >= enemy.body.length) {
+                            this.score += 50 * this.level;
+                            this.enemiesKilled++;
+                            this.audioManager.playSound('eat');
+                            // Crecer según el tamaño del enemigo
+                            for (let i = 0; i < Math.floor(enemy.body.length / 2); i++) {
+                                const tail = this.snake[this.snake.length - 1];
+                                this.snake.push({ ...tail });
+                            }
+                            ateEnemy = true;
+                            return false; // Eliminar enemigo
+                        } else {
+                            // El enemigo es más grande, el jugador pierde
+                            this.endGame();
+                            return true;
+                        }
+                    }
+                    return true;
+                });
+
+                // Comer comida
+                if (head.x === this.food.x && head.y === this.food.y) {
+                    this.score += 10 * this.level;
+                    this.audioManager.playSound('eat');
+                    this.spawnFood();
+                    
+                    // Nivel completado cada 10 frutas
+                    if (this.snake.length % 10 === 0 && this.level < 100) {
+                        this.levelComplete();
+                    }
+                } else if (!ateEnemy) {
+                    this.snake.pop();
+                }
+
+                // Mover serpientes enemigas
+                this.enemySnakes.forEach(enemy => {
+                    enemy.move(this.snake, this.food, this.obstacles, this.enemySnakes);
+                });
+
+                // Enemigos comen comida
+                this.enemySnakes.forEach(enemy => {
+                    const enemyHead = enemy.body[0];
+                    if (enemyHead.x === this.food.x && enemyHead.y === this.food.y) {
+                        enemy.grow();
+                        this.spawnFood();
+                    }
+                });
+
+                // Enemigos se comen entre sí
+                for (let i = this.enemySnakes.length - 1; i >= 0; i--) {
+                    const enemy1 = this.enemySnakes[i];
+                    for (let j = 0; j < this.enemySnakes.length; j++) {
+                        if (i !== j) {
+                            const enemy2 = this.enemySnakes[j];
+                            const head1 = enemy1.body[0];
+                            const head2 = enemy2.body[0];
+                            
+                            if (head1.x === head2.x && head1.y === head2.y) {
+                                // El más grande gana
+                                if (enemy1.body.length < enemy2.body.length) {
+                                    this.enemySnakes.splice(i, 1);
+                                    enemy2.grow();
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                this.updateHUD();
+            }
+
+            drawSnakeSegment(x, y, index, isHead = false, styleIndex = null, snakeLength = 0) {
+                const style = snakeStyles[styleIndex !== null ? styleIndex : this.currentSnakeStyle];
+                const px = x * this.gridSize;
+                const py = y * this.gridSize;
+
+                // Gradiente para efecto 3D
+                const gradient = this.ctx.createRadialGradient(
+                    px + this.gridSize / 2, 
+                    py + this.gridSize / 2, 
+                    2,
+                    px + this.gridSize / 2, 
+                    py + this.gridSize / 2, 
+                    this.gridSize / 2
+                );
+                
+                const colorIndex = index % style.colors.length;
+                gradient.addColorStop(0, style.colors[colorIndex]);
+                gradient.addColorStop(0.7, style.colors[(colorIndex + 1) % style.colors.length]);
+                gradient.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
+
+                this.ctx.fillStyle = gradient;
+                this.ctx.beginPath();
+                this.ctx.roundRect(px + 1, py + 1, this.gridSize - 2, this.gridSize - 2, 4);
+                this.ctx.fill();
+
+                // Patrón de escamas
+                if (style.pattern === 'scales') {
+                    this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+                    this.ctx.lineWidth = 1;
+                    for (let i = 0; i < 3; i++) {
+                        this.ctx.beginPath();
+                        this.ctx.arc(px + 5 + i * 5, py + this.gridSize / 2, 3, 0, Math.PI * 2);
+                        this.ctx.stroke();
+                    }
+                }
+
+                // Cabeza con ojos
+                if (isHead) {
+                    const eyeSize = 3;
+                    const eyeOffset = 5;
+                    
+                    // Determinar dirección (para enemigos usar su propia dirección)
+                    let direction = this.direction;
+                    if (styleIndex !== null && styleIndex !== this.currentSnakeStyle) {
+                        // Para enemigos, calcular dirección basada en los dos primeros segmentos
+                        const enemy = this.enemySnakes.find(e => e.styleIndex === styleIndex);
+                        if (enemy && enemy.body.length > 1) {
+                            direction = {
+                                x: enemy.body[0].x - enemy.body[1].x,
+                                y: enemy.body[0].y - enemy.body[1].y
+                            };
+                        }
+                    }
+                    
+                    // Determinar posición de los ojos según dirección
+                    let eye1X = px + eyeOffset;
+                    let eye1Y = py + eyeOffset;
+                    let eye2X = px + this.gridSize - eyeOffset;
+                    let eye2Y = py + eyeOffset;
+                    
+                    if (direction.y !== 0) {
+                        eye1X = px + eyeOffset;
+                        eye2X = px + this.gridSize - eyeOffset;
+                        eye1Y = eye2Y = py + (direction.y > 0 ? this.gridSize - eyeOffset : eyeOffset);
+                    } else if (direction.x !== 0) {
+                        eye1Y = py + eyeOffset;
+                        eye2Y = py + this.gridSize - eyeOffset;
+                        eye1X = eye2X = px + (direction.x > 0 ? this.gridSize - eyeOffset : eyeOffset);
+                    }
+
+                    // Ojos
+                    this.ctx.fillStyle = style.eyeColor;
+                    this.ctx.beginPath();
+                    this.ctx.arc(eye1X, eye1Y, eyeSize, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    this.ctx.beginPath();
+                    this.ctx.arc(eye2X, eye2Y, eyeSize, 0, Math.PI * 2);
+                    this.ctx.fill();
+
+                    // Pupilas
+                    this.ctx.fillStyle = '#000';
+                    this.ctx.beginPath();
+                    this.ctx.arc(eye1X, eye1Y, eyeSize / 2, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    this.ctx.beginPath();
+                    this.ctx.arc(eye2X, eye2Y, eyeSize / 2, 0, Math.PI * 2);
+                    this.ctx.fill();
+
+                    // Indicador de tamaño para enemigos (mostrar longitud)
+                    if (styleIndex !== null && styleIndex !== this.currentSnakeStyle && snakeLength > 0) {
+                        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                        this.ctx.font = 'bold 10px Arial';
+                        this.ctx.textAlign = 'center';
+                        this.ctx.textBaseline = 'middle';
+                        this.ctx.fillText(snakeLength, px + this.gridSize / 2, py - 8);
+                    }
+                }
+
+                // Brillo
+                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                this.ctx.beginPath();
+                this.ctx.arc(px + this.gridSize / 3, py + this.gridSize / 3, this.gridSize / 6, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
+
+            draw() {
+                // Fondo con textura
+                const bgGradient = this.ctx.createLinearGradient(0, 0, this.canvas.width, this.canvas.height);
+                bgGradient.addColorStop(0, '#0a1f14');
+                bgGradient.addColorStop(1, '#051209');
+                this.ctx.fillStyle = bgGradient;
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // Grid sutil
+                this.ctx.strokeStyle = 'rgba(76, 175, 80, 0.05)';
+                this.ctx.lineWidth = 1;
+                for (let i = 0; i <= this.tileCount; i++) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(i * this.gridSize, 0);
+                    this.ctx.lineTo(i * this.gridSize, this.canvas.height);
+                    this.ctx.stroke();
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, i * this.gridSize);
+                    this.ctx.lineTo(this.canvas.width, i * this.gridSize);
+                    this.ctx.stroke();
+                }
+
+                // Obstáculos
+                this.obstacles.forEach(obs => {
+                    const px = obs.x * this.gridSize;
+                    const py = obs.y * this.gridSize;
+                    
+                    const obsGradient = this.ctx.createRadialGradient(
+                        px + this.gridSize / 2, py + this.gridSize / 2, 2,
+                        px + this.gridSize / 2, py + this.gridSize / 2, this.gridSize / 2
+                    );
+                    obsGradient.addColorStop(0, '#666');
+                    obsGradient.addColorStop(1, '#333');
+                    
+                    this.ctx.fillStyle = obsGradient;
+                    this.ctx.fillRect(px, py, this.gridSize, this.gridSize);
+                    this.ctx.strokeStyle = '#222';
+                    this.ctx.lineWidth = 2;
+                    this.ctx.strokeRect(px, py, this.gridSize, this.gridSize);
+                });
+
+                // Comida (fruta realista)
+                const fx = this.food.x * this.gridSize;
+                const fy = this.food.y * this.gridSize;
+                
+                const foodGradient = this.ctx.createRadialGradient(
+                    fx + this.gridSize / 2, fy + this.gridSize / 2, 2,
+                    fx + this.gridSize / 2, fy + this.gridSize / 2, this.gridSize / 2
+                );
+                foodGradient.addColorStop(0, '#FF6B6B');
+                foodGradient.addColorStop(0.7, '#FF0000');
+                foodGradient.addColorStop(1, '#8B0000');
+                
+                this.ctx.fillStyle = foodGradient;
+                this.ctx.beginPath();
+                this.ctx.arc(fx + this.gridSize / 2, fy + this.gridSize / 2, this.gridSize / 2 - 2, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                // Brillo en la fruta
+                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                this.ctx.beginPath();
+                this.ctx.arc(fx + this.gridSize / 3, fy + this.gridSize / 3, this.gridSize / 6, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                // Serpientes enemigas
+                this.enemySnakes.forEach(enemy => {
+                    enemy.body.forEach((segment, index) => {
+                        this.drawSnakeSegment(segment.x, segment.y, index, index === 0, enemy.styleIndex, enemy.body.length);
+                    });
+                });
+
+                // Serpiente del jugador (dibujar al final para que esté encima)
+                this.snake.forEach((segment, index) => {
+                    this.drawSnakeSegment(segment.x, segment.y, index, index === 0, this.currentSnakeStyle);
+                });
+            }
+
+            updateHUD() {
+                document.getElementById('score').textContent = this.score;
+                document.getElementById('level').textContent = this.level;
+                document.getElementById('length').textContent = this.snake.length;
+                document.getElementById('enemies').textContent = this.enemySnakes.length;
+                document.getElementById('highScore').textContent = this.highScore;
+            }
+
+            setSpeed(speed) {
+                this.speedMultiplier = speed / 100;
+                this.updateGameSpeed();
+            }
+
+            updateGameSpeed() {
+                // Velocidad aumenta con el nivel
+                const levelSpeedIncrease = Math.min(this.level * 5, 100);
+                this.currentSpeed = Math.max(50, this.baseSpeed - levelSpeedIncrease);
+                this.currentSpeed = this.currentSpeed / this.speedMultiplier;
+                
+                if (this.gameLoop) {
+                    clearInterval(this.gameLoop);
+                    this.gameLoop = setInterval(() => this.update(), this.currentSpeed);
+                }
+            }
+
+            update() {
+                if (!this.gameRunning || this.gamePaused) return;
+                this.move();
+                this.draw();
+            }
+
+            pause() {
+                this.gamePaused = true;
+                document.getElementById('pauseOverlay').style.display = 'flex';
+            }
+
+            resume() {
+                this.gamePaused = false;
+                document.getElementById('pauseOverlay').style.display = 'none';
+            }
+
+            levelComplete() {
+                this.gameRunning = false;
+                this.audioManager.playSound('levelUp');
+                
+                document.getElementById('completedLevel').textContent = this.level;
+                document.getElementById('levelScore').textContent = this.score;
+                document.getElementById('levelCompleteOverlay').style.display = 'flex';
+            }
+
+            nextLevel() {
+                if (this.level >= 100) {
+                    this.endGame();
+                    return;
+                }
+                
+                this.level++;
+                this.generateObstacles();
+                this.generateEnemySnakes();
+                this.updateGameSpeed();
+                this.gameRunning = true;
+                document.getElementById('levelCompleteOverlay').style.display = 'none';
+            }
+
+            endGame() {
+                this.gameRunning = false;
+                this.audioManager.playSound('death');
+                this.audioManager.stopBackgroundMusic();
+                
+                if (this.score > this.highScore) {
+                    this.highScore = this.score;
+                    localStorage.setItem('snakeHighScore', this.highScore);
+                }
+                
+                document.getElementById('finalScore').textContent = this.score;
+                document.getElementById('finalLevel').textContent = this.level;
+                document.getElementById('finalLength').textContent = this.snake.length;
+                
+                const gameOverText = document.getElementById('gameOverText');
+                if (this.level >= 100) {
+                    gameOverText.textContent = '🏆 ¡VICTORIA TOTAL! 🏆';
+                    gameOverText.style.color = '#FFD700';
+                } else {
+                    const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+                    gameOverText.textContent = config.game_over_text || defaultConfig.game_over_text;
+                    gameOverText.style.color = '#F44336';
+                }
+                
+                document.getElementById('gameOverOverlay').style.display = 'flex';
+                
+                document.getElementById('pauseBtn').disabled = true;
+                document.getElementById('restartGameBtn').disabled = true;
+            }
+
+            start() {
+                this.gameRunning = true;
+                this.gamePaused = false;
+                this.score = 0;
+                this.level = 1;
+                this.enemiesKilled = 0;
+                this.initSnake();
+                this.direction = { x: 1, y: 0 };
+                this.nextDirection = { x: 1, y: 0 };
+                this.obstacles = [];
+                this.enemySnakes = [];
+                this.generateEnemySnakes();
+                this.spawnFood();
+                this.updateGameSpeed();
+                this.updateHUD();
+                
+                document.getElementById('gameOverOverlay').style.display = 'none';
+                document.getElementById('welcomeOverlay').style.display = 'none';
+                document.getElementById('pauseOverlay').style.display = 'none';
+                
+                document.getElementById('pauseBtn').disabled = false;
+                document.getElementById('restartGameBtn').disabled = false;
+                
+                this.audioManager.playBackgroundMusic();
+                
+                if (this.gameLoop) clearInterval(this.gameLoop);
+                this.gameLoop = setInterval(() => this.update(), this.currentSpeed);
+                
+                this.draw();
+            }
+        }
+
+        let game;
+
+        async function onConfigChange(config) {
+            const welcomeTitle = config.welcome_title || defaultConfig.welcome_title;
+            const welcomeMessage = config.welcome_message || defaultConfig.welcome_message;
+            const gameTitle = config.game_title || defaultConfig.game_title;
+            const startButtonText = config.start_button_text || defaultConfig.start_button_text;
+            const gameOverText = config.game_over_text || defaultConfig.game_over_text;
+
+            document.getElementById('welcomeTitle').textContent = welcomeTitle;
+            document.getElementById('welcomeMessage').textContent = welcomeMessage;
+            document.getElementById('gameTitle').textContent = gameTitle;
+            document.getElementById('startBtn').textContent = startButtonText;
+            document.getElementById('welcomeStartBtn').textContent = startButtonText;
+        }
+
+        window.addEventListener('load', () => {
+            document.getElementById('welcomeOverlay').style.display = 'flex';
+        });
+
+        document.getElementById('welcomeStartBtn').addEventListener('click', () => {
+            if (!game) game = new SnakeGame();
+            game.start();
+        });
+
+        document.getElementById('startBtn').addEventListener('click', () => {
+            if (!game) game = new SnakeGame();
+            game.start();
+        });
+
+        document.getElementById('pauseBtn').addEventListener('click', () => {
+            if (game && game.gameRunning) game.pause();
+        });
+
+        document.getElementById('resumeBtn').addEventListener('click', () => {
+            if (game) game.resume();
+        });
+
+        document.getElementById('quitBtn').addEventListener('click', () => {
+            if (game) {
+                game.endGame();
+                document.getElementById('pauseOverlay').style.display = 'none';
+            }
+        });
+
+        document.getElementById('restartGameBtn').addEventListener('click', () => {
+            if (game) game.start();
+        });
+
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            if (game) game.start();
+        });
+
+        document.getElementById('nextLevelBtn').addEventListener('click', () => {
+            if (game) game.nextLevel();
+        });
+
+        document.getElementById('settingsBtn').addEventListener('click', () => {
+            document.getElementById('settingsOverlay').style.display = 'flex';
+        });
+
+        document.getElementById('closeSettingsBtn').addEventListener('click', () => {
+            document.getElementById('settingsOverlay').style.display = 'none';
+        });
+
+        document.getElementById('volumeSlider').addEventListener('input', (e) => {
+            const value = e.target.value;
+            document.getElementById('volumeValue').textContent = value + '%';
+            if (game) game.audioManager.setVolume(value);
+        });
+
+        document.getElementById('speedSlider').addEventListener('input', (e) => {
+            const value = e.target.value;
+            document.getElementById('speedValue').textContent = value + '%';
+            if (game) game.setSpeed(value);
+        });
+
+        if (window.elementSdk) {
+            window.elementSdk.init({
+                defaultConfig,
+                onConfigChange,
+                mapToCapabilities: (config) => ({
+                    recolorables: [],
+                    borderables: [],
+                    fontEditable: undefined,
+                    fontSizeable: undefined
+                }),
+                mapToEditPanelValues: (config) => new Map([
+                    ["welcome_title", config.welcome_title || defaultConfig.welcome_title],
+                    ["welcome_message", config.welcome_message || defaultConfig.welcome_message],
+                    ["game_title", config.game_title || defaultConfig.game_title],
+                    ["start_button_text", config.start_button_text || defaultConfig.start_button_text],
+                    ["game_over_text", config.game_over_text || defaultConfig.game_over_text]
+                ])
+            });
+        }
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99c28443437eb0b6',t:'MTc2Mjc0NTkwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

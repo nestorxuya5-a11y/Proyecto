@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Game Regional - Tu portal de juegos</title>
+  <style>
+    /* Básicos */
+    :root {
+      --accent: #00ffcc;
+      --card: rgba(34,34,34,0.95);
+      --glass: rgba(0,0,0,0.6);
+      --muted: #ccc;
+      --shadow: 0 6px 20px rgba(0,0,0,0.5);
+    }
+    *{box-sizing:border-box}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('https://i.pinimg.com/originals/36/82/cc/3682ccb6188e4b220862b45b740a4c33.gif') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      min-height: 100vh;
+    }
+
+    /* Header fijo */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 100px;
+      background-color: rgba(10,10,10,0.85);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 0 28px;
+      box-shadow: var(--shadow);
+      z-index: 1000;
+    }
+    .titulo { font-size: 28px; font-weight:700; color: var(--accent); }
+    .logo { width:140px; height:auto; }
+
+    main { padding-top: 120px; text-align: center; }
+
+    h1 { color: var(--accent); font-size: 2.4rem; margin: 4px 0 8px; }
+    p { color: var(--muted); margin: 0 0 24px; }
+
+    /* Grid de juegos */
+    .juegos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      padding: 32px;
+      max-width: 1100px;
+      margin: 0 auto 60px;
+    }
+
+    .juego {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.25));
+      border-radius: 18px;
+      padding: 16px;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.45);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      min-height: 300px;
+    }
+    .juego:focus, .juego:hover { transform: translateY(-6px); box-shadow: 0 16px 28px rgba(0,0,0,0.55); }
+
+    .juego img { width:100%; height:170px; object-fit:cover; border-radius:10px; display:block; }
+    .juego h3 { margin:12px 0 6px; color: var(--accent); font-size: 1.15rem; }
+    .juego p.tip-preview { margin:0; color: #b9dcd1; font-size: 0.95rem; opacity:0.95; }
+
+    footer {
+      text-align:center;
+      padding: 16px;
+      background: rgba(0,0,0,0.6);
+      color: #999;
+      position: relative;
+    }
+
+    /* Modal de consejo */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+    .modal {
+      width: 90%;
+      max-width: 520px;
+      background: linear-gradient(180deg, rgba(10,10,10,0.98), rgba(8,8,8,0.98));
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 22px 60px rgba(0,0,0,0.7);
+      color: #e6f8f0;
+    }
+    .modal h2 { margin:0 0 8px; color: var(--accent); }
+    .modal p { margin: 8px 0 16px; color: #cfeee6; line-height:1.4; }
+    .modal .controls { display:flex; gap:12px; justify-content:flex-end; }
+    .btn {
+      padding: 10px 14px;
+      border-radius:8px;
+      border: none;
+      cursor:pointer;
+      font-weight:700;
+    }
+    .btn.play { background: var(--accent); color: #042; }
+    .btn.close { background: transparent; color: #cfeee6; border:1px solid rgba(255,255,255,0.08); }
+
+    @media (max-width:520px){
+      .juego img { height:140px; }
+      header { height: 84px; padding: 0 16px; }
+      main { padding-top: 104px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="titulo">👾 Game Regional</div>
+    <img src="https://moria.aurens.com/organizations/362029ae-4545-4e01-a1d9-5a79a6e6f493/logos/26b681-regional.png" alt="Logo Regional" class="logo">
+  </header>
+
+  <main>
+    <h1>Bienvenido a Game Regional</h1>
+    <p>Tu zona de juegos clásicos en línea. ¡Haz clic en cualquiera y recibe un tip antes de jugar!</p>
+
+    <div class="juegos" id="juegosGrid">
+
+      <!-- Pac-Man -->
+      <a href="PacManMaster.html" class="juego" data-tip="Aprende los patrones de los fantasmas: Blinky, Pinky, Inky y Clyde; guarda Power Pellets para emergencias.">
+        <img src="https://voodooneon.com/cdn/shop/files/pacman-ice-blue.jpg?v=1699927037&width=1946" alt="Pac-Man">
+        <h3>Pac-Man</h3>
+        <p class="tip-preview">Consejo: guarda Power Pellets para cuando estés rodeado.</p>
+      </a>
+
+      <!-- Snake (Cazando Cursos) -->
+      <a href="Snakepro.html" class="juego" data-tip="Mantente en el centro y planifica 2–3 movimientos; evita girar pegado a las paredes.">
+        <img src="https://us.123rf.com/450wm/frescostudio/frescostudio2003/frescostudio200300022/151691255-snake-mascot-esport-logo-design.jpg" alt="Cazando Cursos">
+        <h3>Snake</h3>
+        <p class="tip-preview">Consejo: mantente en el centro y evita encierros.</p>
+      </a>
+
+      <!-- Mario Bros (TERCER JUEGO) -->
+      <a href="Supermario.html" class="juego" data-tip="Busca bloques secretos y practica timing en los saltos; algunos saltos requieren precisión milimétrica.">
+        <img src="https://www5.minijuegosgratis.com/v3/games/thumbnails/222662_1.jpg" alt="Mario Bros">
+        <h3>Mario Bros</h3>
+        <p class="tip-preview">Consejo: golpea bloques sospechosos: pueden contener power-ups o 1-Up.</p>
+      </a>
+
+    </div>
+  </main>
+
+  <footer>
+    © 2025 PlayZone - Grupo #2 Sistemas Segundo Semestre
+  </footer>
+
+  <!-- Modal con tip antes de navegar -->
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-hidden="true" aria-modal="true">
+    <div class="modal" role="document" aria-labelledby="modalTitle">
+      <h2 id="modalTitle">Consejo antes de jugar</h2>
+      <p id="modalTip">Aquí aparecerá el consejo del juego...</p>
+      <div class="controls">
+        <button class="btn close" id="modalClose">Cerrar</button>
+        <button class="btn play" id="modalPlay">Jugar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Intercepta clicks en las tarjetas .juego para mostrar un tip modal antes de navegar
+    (function(){
+      const grid = document.getElementById('juegosGrid');
+      const modal = document.getElementById('modalBackdrop');
+      const modalTip = document.getElementById('modalTip');
+      const modalPlay = document.getElementById('modalPlay');
+      const modalClose = document.getElementById('modalClose');
+
+      let targetHref = null;
+
+      // Delegación de eventos para manejar tarjetas dinámicas si agregas más luego
+      grid.addEventListener('click', (e) => {
+        // buscar el <a class="juego"> más cercano
+        const item = e.target.closest('.juego');
+        if (!item) return;
+        e.preventDefault(); // evitamos navegación inmediata
+
+        // extraemos tip y href
+        const tip = item.getAttribute('data-tip') || '¡Diviértete!';
+        targetHref = item.getAttribute('href') || '#';
+
+        // mostrar tip en modal
+        modalTip.textContent = tip;
+        modal.style.display = 'flex';
+        modal.setAttribute('aria-hidden', 'false');
+
+        // enfoque accesible
+        modalPlay.focus();
+      });
+
+      // botón Jugar -> navega al enlace
+      modalPlay.addEventListener('click', () => {
+        if (targetHref) {
+          // pequeña animación de salida opcional
+          modal.style.display = 'none';
+          modal.setAttribute('aria-hidden', 'true');
+          // navegar
+          window.location.href = targetHref;
+        }
+      });
+
+      // cerrar modal
+      modalClose.addEventListener('click', () => {
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+        targetHref = null;
+      });
+
+      // cerrar con Escape
+      document.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Escape' && modal.style.display === 'flex') {
+          modal.style.display = 'none';
+          modal.setAttribute('aria-hidden', 'true');
+          targetHref = null;
+        }
+      });
+
+      // cerrar si se hace clic fuera del modal (en el backdrop)
+      modal.addEventListener('click', (ev) => {
+        if (ev.target === modal) {
+          modal.style.display = 'none';
+          modal.setAttribute('aria-hidden', 'true');
+          targetHref = null;
+        }
+      });
+    })();
+  </script>
+
+</body>
+</html>
